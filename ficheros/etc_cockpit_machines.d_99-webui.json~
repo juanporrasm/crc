@@ -1,0 +1,32 @@
+{
+  "192.168.8.9" : {
+    "visible" : true,
+    "user" : "root",
+    "color" : "#67d300",
+    "address" : "192.168.8.9"
+  },
+  "alma" : {
+    "visible" : false
+  },
+  "data" : {
+    "visible" : false
+  },
+  "lata" : {
+    "visible" : false
+  },
+  "rocky" : {
+    "visible" : false
+  },
+  "192.168.8.11" : {
+    "visible" : true,
+    "color" : "#00d1d3",
+    "user" : "root",
+    "address" : "192.168.8.11"
+  },
+  "192.168.8.10" : {
+    "visible" : false,
+    "color" : "#00618a",
+    "user" : "root",
+    "address" : "192.168.8.10"
+  }
+}

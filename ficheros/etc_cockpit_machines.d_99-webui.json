@@ -1,0 +1,32 @@
+{
+  "192.168.2.3" : {
+    "visible" : true,
+    "user" : "root",
+    "color" : "#67d300",
+    "address" : "192.168.5.2"
+  },
+  "uno" : {
+    "visible" : false
+  },
+  "dos" : {
+    "visible" : false
+  },
+  "tres" : {
+    "visible" : false
+  },
+  "cuatro" : {
+    "visible" : false
+  },
+  "192.168.2.4" : {
+    "visible" : true,
+    "color" : "#00d1d3",
+    "user" : "root",
+    "address" : "192.168.5.3"
+  },
+  "192.168.2.5" : {
+    "visible" : false,
+    "color" : "#00618a",
+    "user" : "vagrant",
+    "address" : "192.168.5.4"
+  }
+}

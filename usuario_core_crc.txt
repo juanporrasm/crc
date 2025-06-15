@@ -1,0 +1,26 @@
+PASSWORD DEL USUARIO core EN CRC				Last Update: 11-Mayo-2025
+================================
+
+Por defecto, no se tiene la password del usuario "core" de la MV CRC pero si se podría 
+ usar la autenticación basada en claves para acceder a la MV. El par de claves están en
+  ~/.crc/machines/crc/ y podría conectar por ssh:
+
+	ssh -i ~/.crc/machines/crc/id_ecdsa core@"192.168.130.11"
+
+
+Si se quiere obtener la password del usuario core en la MV del CRC, hay que configurarlo con:
+
+	crc config set enable-emergency-login true
+
+ y la password se podrá consultar en el fichero:
+
+	~/.crc/machines/crc/passwd
+
+En el mismo directorio también podemos encontrar el fichero de kubeconfig con el certificado X.509 
+ que no expira con el que podremos hacer operaciones en el clúster sin usar la autenticación.
+ Para esto, definimos la variable KUBECONFIG y ya cualquier comando que se ejecute a continuación
+ usará el fichero en lugar de token de autenticación:
+
+	export KUBECONFIG=~/.crc/machines/crc/kubeconfig
+
+NOTA: El usuario core sólo se debe usar para troubleshot del clúster cuando no exista otra forma.

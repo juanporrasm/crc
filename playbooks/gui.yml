@@ -1,0 +1,138 @@
+---
+- name: Instalar entorno gráfico en AlmaLinux 9
+  hosts: crc
+  become: yes
+  vars:
+    desktop_environment: "gnome"  # gnome, kde, xfce
+    autologin_user: "vagrant"
+    usuario_grafico: vagrant
+    lang_es: "es_ES.UTF-8"
+
+  tasks:
+    # 1. Actualizar sistema
+#    - name: Actualizar todos los paquetes
+#      dnf:
+#        name: "*"
+#        state: latest
+#      register: update_result
+#      until: update_result is succeeded
+#      retries: 3
+#      delay: 10
+
+    # 2. Instalar EPEL
+#    - name: Habilitar repositorio EPEL
+#      dnf:
+#        name: epel-release
+#        state: present
+
+    # 3. Instalar entorno gráfico
+    - name: Asegurarse de que el idioma español esté instalado
+      dnf:
+        name:
+          - langpacks-es
+          - glibc-langpack-es
+        state: present
+
+    - name: Establecer el locale del sistema a español
+      command: localectl set-locale  LANG={{ lang_es }} 
+      
+    - name: Establecer el mapa de teclado de consola a español
+      command: localectl set-keymap es
+      
+    - name: Instalar grupo Server with GUI
+      dnf:
+        name: "@Server with GUI"
+        state: present
+      register: gui_install
+      until: gui_install is succeeded
+      retries: 2
+
+    # 4. Configurar servicios gráficos
+    - name: Establecer target gráfico
+      command: systemctl set-default graphical.target
+      changed_when: false
+
+    - name: Habilitar GDM
+      service:
+        name: gdm
+        enabled: yes
+        state: started
+      when: desktop_environment == "gnome"
+
+    # 5. Configuración de autologin (solo si el usuario existe)
+    - name: Verificar usuario existe
+      command: id -u {{ autologin_user }}
+      register: user_check
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Configurar autologin
+      blockinfile:
+        path: /etc/gdm/custom.conf
+        block: |
+          [daemon]
+          AutomaticLoginEnable=true
+          AutomaticLogin={{ autologin_user }}
+      when: user_check.rc == 0
+
+    # 6. Instalar herramientas adicionales
+    - name: Instalar paquetes útiles
+      dnf:
+        name:
+          - gnome-tweaks
+          - firefox
+          - virt-viewer
+          - spice-vdagent
+        state: present
+        
+    - name: Establecer el mapa de teclado de consola a español
+      command: localectl set-keymap es
+
+    - name: Establecer el mapa de teclado X11 a español
+      command: localectl set-x11-keymap es
+
+    - name: Crear archivo .bash_profile si no existe
+      file:
+        path: "/home/{{ usuario_grafico }}/.bash_profile"
+        state: touch
+        owner: "{{ usuario_grafico }}"
+        group: "{{ usuario_grafico }}"
+        mode: '0644'
+
+    - name: Añadir variables de entorno al perfil del usuario
+      blockinfile:
+        path: "/home/{{ usuario_grafico }}/.bash_profile"
+        block: |
+          export LANG={{ lang_es }}
+          export LANGUAGE=es_ES:es
+          export LC_ALL={{ lang_es }}
+        marker: "# ANSIBLE-LOCALE"
+    - name: Asegurar que la interfaz eth0 usa DHCP y se conecta automáticamente
+      shell: |
+        nmcli con delete eth0 || true
+        nmcli con add type ethernet ifname eth0 con-name "System eth0" autoconnect yes ipv4.method auto
+        nmcli con up "System eth0"
+
+#    - name: Establecer el idioma de GNOME a español
+#      become_user: "{{ usuario_grafico }}"
+#      shell: |
+#        gsettings set org.gnome.system.locale region '{{ lang_es }}'
+#      environment:
+#        DISPLAY: ":0"
+#        XAUTHORITY: "/home/{{ usuario_grafico }}/.Xauthority"
+#      ignore_errors: yes  # Por si no está activo GNOME al momento de provisionar
+        
+#    - name: Configurar resolución 1920x1080
+#      shell: |
+#        gsettings set org.gnome.desktop.interface scaling-factor 1
+#        gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "{'Gdk/WindowScalingFactor': <2>}"
+#        xrandr --output Virtual-1 --mode 1920x1080
+#      delegate_to: workstation 
+      
+  post_tasks:
+    - name: Mostrar información post-instalación
+      debug:
+        msg: |
+          Instalación completada.
+          Reinicie la máquina con: vagrant reload
+          Conéctese con: remote-viewer spice://127.0.0.1:5900

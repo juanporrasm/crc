@@ -1,0 +1,225 @@
+INSTALAR CRC					Last Update: 7-Mayo-2025 11:26
+=============
+
+-----
+DOCs
+-----
+	https://console.redhat.com/openshift/create/local
+	https://developers.redhat.com/products/openshift-local/overview
+	https://crc.dev/docs/introducing/
+    	https://developers.redhat.com/articles/2025/03/27/how-run-microshift-openshift-local-and-podman-desktop
+	https://www.redhat.com/sysadmin/codeready-containers   =   https://www.redhat.com/en/blog/codeready-containers
+
+ Versiones disponibles en:
+
+	https://mirror.openshift.com/pub/openshift-v4/clients/crc/latest/
+
+    Última versión: 2.49.0  (OCP 4.18)
+    Usar versión 2.33 para la versión de OCP 4.14
+
+------
+PASO 1: Obtener los ficheros 
+------
+	- Hacer login en https://redhat.com 
+
+	- Bajar fichero tar y pull-secret de https://console.redhat.com/openshift/create/local
+
+	- Desempaquetar: abrir un terminal en la máquina física y ejecutar:
+
+		cd ~/Downloads/; tar xvf crc-linux-amd64.tar.xz
+		rm crc-linux-amd64.tar.xz
+
+	- Crear directorio bin en home del usuario: 
+
+		mkdir ~/bin
+
+	- Copiar fichero crc en en bin del usuario (y asegurarse de que tiene permisos de ejecución): 
+
+		cp ~/Downloads/crc-linux-*-amd64/crc ~/bin/
+
+	- Añadir al PATH el directorio bin:  (no suele ser necesario)
+
+		export PATH=$PATH:$HOME/bin
+		echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
+
+	- Configurar CRC:   (tarda un rato)
+
+		crc setup
+
+              Pregunta: Would you like to contribute anonymous usage statistics? [y/N]: N    -> Mejor poner N
+
+	   esto crea el dir ~/.crc si no existe 
+
+ NOTA: Tarda un rato en descargar todo (aprox. 20Gb)
+       No usar el root del sistema para ejecutar CRC
+
+------
+PASO 2: Crear la máquina virtual con el clúster
+------
+
+ - Creación del clúster OCP en la MV CRC: (tarda un rato)
+
+	crc start -p ~/Downloads/pull-secret.txt
+
+ ¡OJO! Tardar un rato largo en configurar el clúster OCP. Cuando termina muestra:
+
+	- URL de la consola web
+	- password del usuario "kubeadmin"
+        - password del usuario "developer"
+	- cómo hacer login en el clúster CRC. 
+
+  Guardo toda esta información
+        
+ NOTA: si da error el comando del tipo "Error starting machine: Error in driver during machine start: virError(Code=9, Domain=10, Message='operation failed: Unable to find any firmware to satisfy 'efi'')" editar la VM:
+
+    virsh edit crc   y buscar la línea  "<os firmware='efi'>", cambiar por  "<os>"   y quitar bloque <firmware> de más abajo
+  incluso  "dnf update qemu-kvm*"
+
+  Otros errores se solucionan reiniciando la máquina física
+
+------
+PASO 3: Customizaciones en el entorno del usuario
+------
+ - Para poder usar el comando oc:
+
+	crc oc-env
+	eval $(crc oc-env)
+
+ y dejarlo añadido en ~/.bashrc
+
+ 	echo 'eval $(crc oc-env)' >> ~/.bashrc
+
+-> Activar la bash completion para el comando crc y oc:
+
+	crc completion bash > ~/.crc_bash_completion.sh
+	echo 'source ~/.crc_bash_completion.sh' >> ~/.bashrc
+	oc completion bash > ~/.oc_bashcompletion.sh
+	echo 'source ~/.oc_bashcompletion.sh' >> ~/.bashrc
+	source ~/.bashrc
+
+-------------------------------------
+CONFIGURACIONES EN LA MÁQUINA VIRTUAL
+-------------------------------------
+
+Por defecto la máquina virtual tiene 4 vCPUs, 9.37 Gib de RAM y 32.68 Gb de disco.   (Ampliar el disco)
+Estas configuraciones están guardadas en: ~/.crc/crc.json y se pueden ver con:
+
+	crc config view 
+
+  si alguna de las configuraciones tiene el valor por defecto, no aparece.
+
+  Se puede editar el fichero directamente o modificarlas con los comandos siguientes:
+
+ -> Cambiar el número de cpus:
+
+	crc config set cpus <numero_cpus>
+
+ -> Cambiar la cantidad de memoria:
+
+	crc config set memory <memoria>		-> en Mib
+
+ -> Espacio de disco:
+
+	crc config set disk-size <disco>	-> en GiB
+
+ -> Cambiar el pull secret:
+
+	crc config set pull-secret-file <fichero>.json
+
+ -> Permitir la telemetría:
+	
+	crc config set consent-telemetry yes
+
+    Con esto evitamos que CRC nos pregunte: “Would you like to contribute anonymous usage statistics [y/N]”:
+	y envía datos a Red Hat.
+
+ -> Activar la monitorización:
+		
+	crc config set enable-cluster-monitoring yes
+
+ -> Ver la lista completa de modificaciones posibles del CRC:
+
+	crc config --help
+
+--------------------------------
+OPERACIONES CON EL CLÚSTER LOCAL
+--------------------------------
+ -> Ver estado de la MV:
+
+	crc status		-> Uso de RAM de casi 6Gb de los 9.37 Gb, casi 25 Gb de disco usados de los 32.68 Gb
+
+ -> Arrancar la MV CRC:
+
+	crc start		-> tarda un rato en levantar todo el clúster
+
+ -> Parar la MV CRC:
+
+	crc stop		-> tarda unos minutos en apagar el clúster
+
+ -> Acceder a la consola web con el navegador por defecto:
+
+	crc console
+
+ -> Recuperar las password de los usuarios "developer" y "kubeadmin":
+
+	crc console --credentials
+
+ -> Ver el estado de los clúster operators: (usando el usuario "kubeadmin"):
+
+	oc get co		-> Deben estar todos con AVAILABLES a True, PROGRESSING a False y DEGRADED a False
+
+  -> Hacer login en el clúster OCP:
+
+	oc login -u <usuario> -p <password> <API_OCP>
+
+  el token de acceso, válido durante 24 horas (salvo que se haya modificado esto en la configuración del clúster), 
+   se guarda en:   ~/.kube/config
+ 
+ -> Ver en que proyecto estamos, clúster al que se hizo login y con qué usuario:
+
+	oc whoami -c
+
+ -> Crear nuevo proyecto:
+
+	oc new-project <nombre>
+
+ -> Borrar el clúster y la MV que lo contiene:
+
+	crc delete
+	crc cleanup 
+  
+  ahora se puede recrear el clúster con crc setup
+
+
+EXTRA: Instalar comando odo
+------
+	wget https://mirror.openshift.com/pub/openshift-v4/clients/odo/latest/odo-linux-amd64.tar.gz
+	tar -xvf odo-linux-amd64.tar.gz
+	mv odo ~/bin
+	chmod +x ~/bin/odo
+	rm odo-linux-amd64.tar.gz
+
+ -> Acceder al clúster:
+
+	odo login -u develper -p developer <API_OCP>
+
+ -> Crear proyecto:
+
+	odo project create <nombre>
+
+------------------
+CREAR APP EJEMPLO
+------------------
+ 
+  oc login -u developer -p developer https://api.crc.testing:6443
+  oc new-project wild-west
+  oc import-image openjdk18 --from=registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift --confirm
+  oc policy add-role-to-user view system:serviceaccount:wild-west:default
+  oc new-app openjdk18~https://github.com/openshift-evangelists/Wild-West-Backend --name=backend
+  oc new-app https://github.com/openshift-evangelists/Wild-West-Frontend --name=frontend
+  oc set env deployment/frontend COMPONENT_BACKEND_HOST=backend COMPONENT_BACKEND_PORT=8080
+  
+
+
+ TO BE CONTINUED ....
+

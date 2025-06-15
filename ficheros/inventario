@@ -1,0 +1,10 @@
+[all]
+
+192.168.5.2  ## workstation 
+192.168.5.3  ## servera
+192.168.5.4  ## serverb
+192.168.5.5  ## crc
+workstation  ansible_host=192.168.5.2
+servera      ansible_host=192.168.5.3
+serverb      ansible_host=192.168.5.4 
+crc          ansible_host=192.168.5.5 

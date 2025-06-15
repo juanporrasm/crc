@@ -1,0 +1,3 @@
+#PS1='\[$(tput setaf 39)\]\u@\h \W]\[$(tput sgr0)\] '
+TERM=xterm-256color
+PS1='\[$(tput bold; tput setaf 46)\]\u\[$(tput setaf 123)\]@\[$(tput setaf 190)\]\h \[$(tput setaf 28)\]\W]\[$(tput sgr0)\] '

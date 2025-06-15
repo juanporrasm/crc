@@ -1,0 +1,8 @@
+set t_Co=256          " cantidad de colores  
+set history=10000     " aumenta historico
+set nu                " nuemra linea
+set wildmenu          " autocompletar
+set background=dark   " cambia fondo
+set hlsearch          " Resalta las letras al hacer búsquedas incrementales.
+set laststatus=2      " Muestra siempre la barra de estado de vim, mostrando el nombre del fichero, estado, modo actual
+

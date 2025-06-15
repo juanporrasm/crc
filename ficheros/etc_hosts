@@ -1,0 +1,9 @@
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+192.168.5.2  workstation.mio.es workstation
+192.168.5.3  servera.mio.es servera
+192.168.5.4  serverb.mio.es serverb
+192.168.5.5  crc.mio.es crc
+
+

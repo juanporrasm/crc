@@ -1,0 +1,2 @@
+echo "PS1='[\D{%Y-%m-%d} \A] \u@\h:\w\$ '" >> /etc/skel/.bashrc
+for i in $(cat usuarios); do useradd $i; echo "redhat"|passwd --stdin $i; done
