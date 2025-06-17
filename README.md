@@ -1,12 +1,12 @@
 # $\textsf{\color{#1761f8}{Nota:}}$
 -----
-## CRC
+##  $\textsf{\color{#129C00}{CRC}}$
 En la carpta CRC añade tu pull-secret.txt . 
 Lo puedes bajar de: https://console.redhat.com/openshift/create/local
-## Scripts
+## $\textsf{\color{#129C00}{Scripts}}$
 En la carpeta scripts, en el script comun4.sh, modifica la linea 7:
 ``` bash
 sudo subscription-manager register --username="TU_USUARIO" --password="TU_CONTRASEÑA"
 ```
-## Acceso
+## $\textsf{\color{#129C00}{Acceso}$
 Se crea un fichero llamado credenciales en el home de vagrant, para poder acceder, a al consola y a la api.
