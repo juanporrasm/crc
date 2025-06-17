@@ -1,4 +1,4 @@
-# $\textsf{\color{#1761f8}{Nota:}
+# $\textsf{\color{#1761f8}{Nota:}}$
 -----
 ## CRC
 En la carpta CRC añade tu pull-secret.txt . 
