@@ -30,6 +30,7 @@ sudo yum -y install lsof vim tree lvm2 bzip2 yum-utils wget curl tmux
 sudo yum -y install sshpass psmisc nmap mlocate dos2unix tcpdump python3-pip
 sudo yum -y install nc htop strace man man-pages-overrides sysstat unzip dmidecode  
 sudo yum -y install bind-utils bash-completion  net-tools inotify-tools 
+sudo dnf -y install netavark kubernetes-kubectl git skopeo helm httpd-tools
 # man-pages-es http python-pip lynx
 ### Actualiza base de datos de locate ###
 sudo figlet -c "updatedb"
