@@ -9,4 +9,4 @@ En la carpeta scripts, en el script comun4.sh, modifica la linea 7:
 sudo subscription-manager register --username="TU_USUARIO" --password="TU_CONTRASEÑA"
 ```
 ## $\textsf{\color{#129C00}{Acceso}}$
-Se crea un fichero llamado credenciales en el home de vagrant, para poder acceder, a al consola y a la api.
+Se crea un fichero llamado **credenciales** en el home de vagrant, para poder acceder, a la consola y a la API.
